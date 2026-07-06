@@ -10,19 +10,19 @@ class TrackingScreen extends StatefulWidget {
 }
 
 class _TrackingScreenState extends State<TrackingScreen> {
-  // 0: Placed, 1: Preparing, 2: On the Way, 3: Delivered
   int _currentStatus = 0;
   Timer? _mockTimer;
 
   @override
   void initState() {
     super.initState();
-    // Simulate real-time updates from Firebase every 3 seconds for testing
     _mockTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
       if (_currentStatus < 3) {
-        setState(() {
-          _currentStatus++;
-        });
+        if (mounted) {
+          setState(() {
+            _currentStatus++;
+          });
+        }
       } else {
         timer.cancel();
       }
@@ -38,8 +38,10 @@ class _TrackingScreenState extends State<TrackingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: const Key('tracking_scaffold'),
       backgroundColor: Colors.white,
       appBar: AppBar(
+        key: const Key('tracking_app_bar'),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -56,7 +58,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
           style: TextStyle(fontSize: 24),
         ),
         centerTitle: true,
-        automaticallyImplyLeading: false, // Prevent going back to cart
+        automaticallyImplyLeading: false,
       ),
       body: Container(
         width: double.infinity,
@@ -69,8 +71,8 @@ class _TrackingScreenState extends State<TrackingScreen> {
         ),
         child: Column(
           children: [
-            // Simulated Map Area or Status-Specific Visuals
             Container(
+              key: const Key('tracking_visual_container'),
               height: 250,
               width: double.infinity,
               color: Colors.grey[200]!.withValues(alpha: 0.5),
@@ -79,14 +81,13 @@ class _TrackingScreenState extends State<TrackingScreen> {
 
             const SizedBox(height: 20),
 
-            // Order Status Text
             Text(
               _getStatusText(),
+              key: ValueKey('tracking_status_text_$_currentStatus'),
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
 
-            // Custom Status Tracker
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Column(
@@ -101,18 +102,18 @@ class _TrackingScreenState extends State<TrackingScreen> {
 
             const Spacer(),
 
-            // Back to Home Button
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
+                  key: const Key('tracking_back_home_button'),
                   onPressed: () {
                     Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(builder: (c) => const MainLayout()),
-                          (route) => false, // Clears the navigation stack
+                          (route) => false,
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -137,26 +138,26 @@ class _TrackingScreenState extends State<TrackingScreen> {
 
   Widget _getVisualForStatus() {
     if (_currentStatus == 1) {
-      // 1. Preparing the food
       return Image.asset(
         'images/food-delivery.png',
+        key: const Key('tracking_prep_image'),
         fit: BoxFit.contain, 
       );
     } else if (_currentStatus == 2) {
-      // 2. Out for delivery (The Scooter Image)
       return Image.asset(
         'images/delivery.jpg',
+        key: const Key('tracking_delivery_image'),
         fit: BoxFit.cover,
       );
     } else if (_currentStatus == 3) {
-      // 3. Delivered (The Hand-off Image)
       return Image.asset(
         'images/delivered.jpg',
+        key: const Key('tracking_delivered_image'),
         fit: BoxFit.cover,
       );
     } else {
-      // 0. Order Placed (Default Map)
       return const Stack(
+        key: Key('tracking_searching_visual'),
         alignment: Alignment.center,
         children: [
           Icon(Icons.map, size: 100, color: Colors.grey),
@@ -192,6 +193,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
     bool isCurrent = _currentStatus == stepIndex;
 
     return Row(
+      key: ValueKey('tracker_step_$stepIndex'),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Column(
@@ -201,7 +203,7 @@ class _TrackingScreenState extends State<TrackingScreen> {
               backgroundColor: isCompleted ? Colors.green : Colors.grey[300],
               child: Icon(icon, color: isCompleted ? Colors.white : Colors.grey[600]),
             ),
-            if (stepIndex < 3) // Don't draw a line after the last step
+            if (stepIndex < 3)
               Container(
                 height: 40,
                 width: 3,

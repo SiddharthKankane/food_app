@@ -8,17 +8,13 @@ class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   void _handleLogout(BuildContext context) {
-    // 1. Clear session
     Provider.of<AuthProvider>(context, listen: false).logout();
-    
-    // 2. Clear favorites from memory
     Provider.of<FavoritesProvider>(context, listen: false).clearFavorites();
 
-    // 3. Navigate back to the Auth Screen
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (c) => const AuthScreen()),
-      (route) => false, // This clears the navigation stack entirely
+      (route) => false,
     );
   }
 
@@ -27,6 +23,7 @@ class ProfileScreen extends StatelessWidget {
     final userData = Provider.of<AuthProvider>(context);
 
     return Scaffold(
+      key: const Key('profile_scaffold'),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -40,17 +37,17 @@ class ProfileScreen extends StatelessWidget {
           child: Column(
             children: [
               const SizedBox(height: 40),
-              // Profile Picture
-              const CircleAvatar(
+              CircleAvatar(
+                key: const Key('profile_avatar'),
                 radius: 60,
-                backgroundColor: Color.fromARGB(255, 238, 238, 238),
-                backgroundImage: AssetImage("images/user.png"),
+                backgroundColor: const Color.fromARGB(255, 238, 238, 238),
+                backgroundImage: const AssetImage("images/user.png"),
               ),
               const SizedBox(height: 20),
 
-              // DYNAMIC: Actual User Details
               Text(
                 userData.username ?? "Guest User",
+                key: const Key('profile_username'),
                 style: const TextStyle(
                   fontSize: 28, 
                   fontWeight: FontWeight.bold,
@@ -60,32 +57,36 @@ class ProfileScreen extends StatelessWidget {
               const SizedBox(height: 5),
               Text(
                 userData.email ?? "no-email@testkraft.com",
+                key: const Key('profile_email'),
                 style: const TextStyle(fontSize: 16, color: Colors.black54),
               ),
               const SizedBox(height: 30),
 
-              // Account Options
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Card(
+                  key: const Key('profile_info_card'),
                   elevation: 4,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                   color: Colors.white.withValues(alpha: 0.9),
                   child: Column(
                     children: [
                       ListTile(
+                        key: const Key('profile_address_tile'),
                         leading: const Icon(Icons.location_on, color: Colors.cyan),
                         title: const Text("Delivery Address"),
                         subtitle: Text(userData.address ?? "No address provided"),
                       ),
                       const Divider(height: 1),
                       ListTile(
+                        key: const Key('profile_phone_tile'),
                         leading: const Icon(Icons.phone, color: Colors.green),
                         title: const Text("Phone Number"),
                         subtitle: Text(userData.phone ?? "No phone provided"),
                       ),
                       const Divider(height: 1),
                       ListTile(
+                        key: const Key('profile_logout_tile'),
                         leading: const Icon(Icons.logout, color: Colors.red),
                         title: const Text("Logout"),
                         onTap: () => _handleLogout(context),

@@ -13,7 +13,7 @@ class CustomTextField extends StatelessWidget {
     this.hintText,
     this.enabled = true,
     this.isObscure = false,
-    super.key,
+    super.key, 
   });
 
   @override
@@ -25,15 +25,20 @@ class CustomTextField extends StatelessWidget {
       ),
       padding: const EdgeInsets.all(8.0),
       margin: const EdgeInsets.all(10),
-      child: TextFormField(
-        enabled: enabled,
-        controller: controller,
-        obscureText: isObscure,
-        cursorColor: Theme.of(context).primaryColor,
-        decoration: InputDecoration(
-          prefixIcon: Icon(data, color: Colors.cyan),
-          focusColor: Theme.of(context).primaryColor,
-          hintText: hintText,
+      // Adding Semantics for resource identification
+      child: Semantics(
+        identifier: key != null ? key.toString() : hintText,
+        child: TextFormField(
+          key: key != null ? ValueKey('field_${key.toString()}') : null,
+          enabled: enabled,
+          controller: controller,
+          obscureText: isObscure,
+          cursorColor: Theme.of(context).primaryColor,
+          decoration: InputDecoration(
+            prefixIcon: Icon(data, color: Colors.cyan),
+            focusColor: Theme.of(context).primaryColor,
+            hintText: hintText,
+          ),
         ),
       ),
     );

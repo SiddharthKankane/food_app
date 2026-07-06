@@ -16,7 +16,9 @@ class _CheckoutOptionsScreenState extends State<CheckoutOptionsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: const Key('checkout_options_scaffold'),
       appBar: AppBar(
+        key: const Key('checkout_options_app_bar'),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(colors: [Colors.cyan, Colors.amber]),
@@ -38,8 +40,8 @@ class _CheckoutOptionsScreenState extends State<CheckoutOptionsScreen> {
           padding: const EdgeInsets.all(20.0),
           child: Column(
             children: [
-              // Delivery Instructions
               TextField(
+                key: const Key('checkout_note_field'),
                 controller: _noteController,
                 style: const TextStyle(color: Colors.black),
                 decoration: InputDecoration(
@@ -55,8 +57,8 @@ class _CheckoutOptionsScreenState extends State<CheckoutOptionsScreen> {
               ),
               const SizedBox(height: 20),
               
-              // Payment Method Selection
               Container(
+                key: const Key('checkout_payment_container'),
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.9),
@@ -65,11 +67,16 @@ class _CheckoutOptionsScreenState extends State<CheckoutOptionsScreen> {
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButtonFormField<String>(
+                    key: const Key('checkout_payment_dropdown'),
                     value: _paymentMethod,
                     dropdownColor: Colors.white,
                     style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontFamily: 'TimesNewRoman'),
                     items: ["Cash on Delivery", "Credit Card", "UPI"].map((m) {
-                      return DropdownMenuItem(value: m, child: Text(m));
+                      return DropdownMenuItem(
+                        key: ValueKey('payment_option_$m'),
+                        value: m, 
+                        child: Text(m)
+                      );
                     }).toList(),
                     onChanged: (val) => setState(() => _paymentMethod = val!),
                     decoration: const InputDecoration(
@@ -87,6 +94,7 @@ class _CheckoutOptionsScreenState extends State<CheckoutOptionsScreen> {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
+                  key: const Key('checkout_confirm_button'),
                   onPressed: () {
                     widget.onOrderConfirmed(_paymentMethod, _noteController.text);
                     Navigator.pop(context);

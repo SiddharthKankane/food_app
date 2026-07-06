@@ -23,22 +23,22 @@ class _MainLayoutState extends State<MainLayout> {
     _currentIndex = widget.initialIndex;
   }
 
-  // List of screens that the bottom navigation bar will switch between
   final List<Widget> _screens = [
-    const HomeScreen(),
-    const SearchScreen(),
-    const FavoritesScreen(),
-    const OrdersScreen(),
-    const ProfileScreen(),
+    const HomeScreen(key: Key('home_screen')),
+    const SearchScreen(key: Key('search_screen')),
+    const FavoritesScreen(key: Key('favorites_screen')),
+    const OrdersScreen(key: Key('orders_screen')),
+    const ProfileScreen(key: Key('profile_screen')),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // The body changes based on which tab is tapped
+      key: const Key('main_layout_scaffold'),
       body: _screens[_currentIndex],
 
       bottomNavigationBar: BottomNavigationBar(
+        key: const Key('main_bottom_nav_bar'),
         currentIndex: _currentIndex,
         onTap: (index) {
           setState(() {
@@ -49,26 +49,26 @@ class _MainLayoutState extends State<MainLayout> {
         unselectedItemColor: Colors.grey,
         backgroundColor: Colors.white,
         elevation: 10,
-        type: BottomNavigationBarType.fixed, // Keeps all labels visible
+        type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Icon(Icons.home, key: Key('nav_home_icon')),
             label: "Home",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
+            icon: Icon(Icons.search, key: Key('nav_search_icon')),
             label: "Search",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
+            icon: Icon(Icons.favorite, key: Key('nav_favorites_icon')),
             label: "Favorites",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.receipt_long),
+            icon: Icon(Icons.receipt_long, key: Key('nav_orders_icon')),
             label: "Orders",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+            icon: Icon(Icons.person, key: Key('nav_profile_icon')),
             label: "Profile",
           ),
         ],

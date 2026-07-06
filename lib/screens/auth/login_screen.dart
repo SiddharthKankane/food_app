@@ -34,7 +34,6 @@ class _LoginScreenState extends State<LoginScreen> {
     if (userData != null) {
       final userId = userData['id'].toString();
       
-      // 1. Set Global User Session
       Provider.of<AuthProvider>(context, listen: false).setUserSession(
         userId: userId,
         username: userData['username'],
@@ -43,7 +42,6 @@ class _LoginScreenState extends State<LoginScreen> {
         address: userData['address'] ?? "Delhi, India",
       );
 
-      // 2. Fetch Favorites ONLY for this user
       await Provider.of<FavoritesProvider>(context, listen: false).fetchFavorites(userId);
 
       if (!mounted) return;
@@ -53,7 +51,10 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Invalid username or password!")),
+        const SnackBar(
+          key: Key('login_error_snackbar'),
+          content: Text("Invalid username or password!")
+        ),
       );
     }
   }
@@ -61,6 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: const Key('login_scaffold'),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -72,6 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         child: SafeArea(
           child: SingleChildScrollView(
+            key: const Key('login_scroll_view'),
             child: Column(
               children: [
                 Container(
@@ -80,6 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: const EdgeInsets.all(15.0),
                     child: Image.asset(
                       "images/welcome.png", 
+                      key: const Key('login_welcome_image'),
                       height: 270,
                     ),
                   ),
@@ -91,16 +95,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       const Text(
                         "Demo Login: testkraft / testkraft",
+                        key: Key('login_demo_hint'),
                         style: TextStyle(color: Colors.white70, fontStyle: FontStyle.italic),
                       ),
                       const SizedBox(height: 10),
                       CustomTextField(
+                        key: const Key('login_username_field'),
                         data: Icons.person,
                         controller: _userController,
                         hintText: "Username",
                         isObscure: false,
                       ),
                       CustomTextField(
+                        key: const Key('login_password_field'),
                         data: Icons.lock,
                         controller: _passController,
                         hintText: "Password",
@@ -111,8 +118,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 20),
                 _isLoading 
-                  ? const CircularProgressIndicator(color: Colors.white)
+                  ? const CircularProgressIndicator(
+                      key: Key('login_loading_indicator'),
+                      color: Colors.white
+                    )
                   : ElevatedButton(
+                      key: const Key('login_button'),
                       onPressed: _attemptLogin,
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.purple,

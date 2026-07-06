@@ -7,14 +7,15 @@ import 'package:food_app/screens/cart/cart_screen.dart';
 class ItemDetailScreen extends StatelessWidget {
   final Item item;
 
-  // We pass the specific Item model into this screen when navigating
   const ItemDetailScreen({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: const Key('item_detail_scaffold'),
       backgroundColor: Colors.white,
       appBar: AppBar(
+        key: const Key('item_detail_app_bar'),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -33,6 +34,7 @@ class ItemDetailScreen extends StatelessWidget {
         actions: [
           Consumer<CartProvider>(
             builder: (_, cart, ch) => Badge(
+              key: const Key('item_detail_cart_badge'),
               label: Text(
                 cart.itemCount.toString(),
                 style: const TextStyle(color: Colors.white),
@@ -41,6 +43,7 @@ class ItemDetailScreen extends StatelessWidget {
               child: ch,
             ),
             child: IconButton(
+              key: const Key('item_detail_cart_button'),
               icon: const Icon(Icons.shopping_cart, color: Colors.black, size: 28),
               onPressed: () {
                 Navigator.push(
@@ -65,19 +68,18 @@ class ItemDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // High-Resolution Image Header
             SizedBox(
               width: double.infinity,
               height: 300,
               child: Image.network(
                 item.imageUrl,
+                key: const Key('item_detail_image'),
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) =>
                 const Icon(Icons.fastfood, size: 100, color: Colors.grey),
               ),
             ),
 
-            // Details Section
             Padding(
               padding: const EdgeInsets.all(18.0),
               child: Column(
@@ -89,6 +91,7 @@ class ItemDetailScreen extends StatelessWidget {
                       Expanded(
                         child: Text(
                           item.title,
+                          key: const Key('item_detail_title'),
                           style: const TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
@@ -97,6 +100,7 @@ class ItemDetailScreen extends StatelessWidget {
                       ),
                       Text(
                         "\$${item.price.toStringAsFixed(2)}",
+                        key: const Key('item_detail_price'),
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -117,6 +121,7 @@ class ItemDetailScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     item.description,
+                    key: const Key('item_detail_description'),
                     style: const TextStyle(
                       fontSize: 16,
                       color: Colors.black54,
@@ -129,9 +134,8 @@ class ItemDetailScreen extends StatelessWidget {
 
             const Spacer(),
 
-            // Floating Bottom Action Bar
             Container(
-              padding: const EdgeInsets.fromLTRB(20, 15, 20, 45), // Increased bottom padding to move button up
+              padding: const EdgeInsets.fromLTRB(20, 15, 20, 45),
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.9),
                 boxShadow: [
@@ -147,14 +151,15 @@ class ItemDetailScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton.icon(
+                  key: const Key('item_detail_add_to_cart_button'),
                   onPressed: () {
-                    // Trigger the ViewModel/Provider logic
                     Provider.of<CartProvider>(context, listen: false)
                         .addItem(item.id, item.price, item.title);
 
                     ScaffoldMessenger.of(context).hideCurrentSnackBar();
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
+                        key: const Key('item_detail_added_snackbar'),
                         content: Text('${item.title} added to cart!'),
                         duration: const Duration(seconds: 2),
                         backgroundColor: Colors.green,

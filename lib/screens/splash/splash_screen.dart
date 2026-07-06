@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart'; // 1. Add the Lottie import
+import 'package:lottie/lottie.dart';
 import 'package:food_app/screens/auth/auth_screen.dart';
 
 class MySplashScreen extends StatefulWidget {
@@ -15,7 +15,6 @@ class _MySplashScreenState extends State<MySplashScreen> {
   void initState() {
     super.initState();
     
-    // We increased the timer to 4 seconds to let the animation fully play out
     Timer(const Duration(seconds: 4), () {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (c) => const AuthScreen()));
@@ -25,22 +24,24 @@ class _MySplashScreenState extends State<MySplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: const Key('splash_scaffold'),
       backgroundColor: Colors.white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // 2. Replace the Image.asset with Lottie.asset
             Lottie.asset(
               'animations/interaction.json',
+              key: const Key('splash_animation'),
               width: 300,
               height: 300,
               fit: BoxFit.contain,
-              repeat: false, // Set to false so it plays once and stops
+              repeat: false,
             ),
             const SizedBox(height: 20),
             const Text(
               "BringApp Cafe",
+              key: Key('splash_title'),
               style: TextStyle(
                 fontSize: 40,
                 color: Colors.cyan,
@@ -52,6 +53,7 @@ class _MySplashScreenState extends State<MySplashScreen> {
             const SizedBox(height: 10),
             const Text(
               "Order Food Online",
+              key: Key('splash_subtitle'),
               style: TextStyle(
                 fontSize: 18,
                 color: Colors.black54,

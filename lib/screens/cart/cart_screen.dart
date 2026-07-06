@@ -19,7 +19,9 @@ class CartScreen extends StatelessWidget {
     final cartItemKeys = cart.items.keys.toList();
 
     return Scaffold(
+      key: const Key('cart_scaffold'),
       appBar: AppBar(
+        key: const Key('cart_app_bar'),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(colors: [Colors.cyan, Colors.amber]),
@@ -27,9 +29,9 @@ class CartScreen extends StatelessWidget {
         ),
         title: const Text("Your Cart"),
         leading: IconButton(
+          key: const Key('cart_back_button'),
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            // Navigate explicitly to Search screen (index 1)
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (c) => const MainLayout(initialIndex: 1)),
@@ -39,17 +41,24 @@ class CartScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
+            key: const Key('cart_clear_all_button'),
             icon: const Icon(Icons.delete_sweep),
             onPressed: () {
               if (cart.items.isNotEmpty) {
                 showDialog(
                   context: context,
                   builder: (ctx) => AlertDialog(
+                    key: const Key('cart_clear_dialog'),
                     title: const Text("Clear Cart?"),
                     content: const Text("Do you want to remove all items from the cart?"),
                     actions: [
-                      TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text("No")),
                       TextButton(
+                        key: const Key('cart_clear_no'),
+                        onPressed: () => Navigator.of(ctx).pop(), 
+                        child: const Text("No")
+                      ),
+                      TextButton(
+                        key: const Key('cart_clear_yes'),
                         onPressed: () {
                           cart.clear();
                           Navigator.of(ctx).pop();
@@ -83,12 +92,14 @@ class CartScreen extends StatelessWidget {
                         children: [
                           Image.asset(
                             'images/state.jpg',
+                            key: const Key('cart_empty_image'),
                             height: 250,
                             fit: BoxFit.contain,
                           ),
                           const SizedBox(height: 20),
                           const Text(
                             "Your cart is empty!",
+                            key: Key('cart_empty_title'),
                             style: TextStyle(
                               fontSize: 24, 
                               fontWeight: FontWeight.bold, 
@@ -98,18 +109,20 @@ class CartScreen extends StatelessWidget {
                           const SizedBox(height: 10),
                           const Text(
                             "Looks like you haven't added any food yet.",
+                            key: Key('cart_empty_subtitle'),
                             style: TextStyle(fontSize: 16, color: Colors.black54),
                           ),
                         ],
                       ),
                     )
                   : ListView.builder(
+                      key: const Key('cart_items_list'),
                       itemCount: cart.items.length,
                       itemBuilder: (context, i) {
                         final item = cartItems[i];
                         final productId = cartItemKeys[i];
                         return Dismissible(
-                          key: ValueKey(productId),
+                          key: ValueKey('dismissible_$productId'),
                           background: Container(
                             color: Colors.red,
                             alignment: Alignment.centerRight,
@@ -119,8 +132,9 @@ class CartScreen extends StatelessWidget {
                           direction: DismissDirection.endToStart,
                           onDismissed: (direction) => cart.removeItemCompletely(productId),
                           child: Card(
+                            key: ValueKey('cart_card_$productId'),
                             color: Colors.white.withValues(alpha: 0.9),
-                            margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                            margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
                             child: ListTile(
                               title: Text(item.title, style: const TextStyle(fontWeight: FontWeight.bold)),
                               subtitle: Text('Total: \$${(item.price * item.quantity).toStringAsFixed(2)}'),
@@ -128,11 +142,17 @@ class CartScreen extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton(
+                                    key: ValueKey('cart_decrease_$productId'),
                                     icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
                                     onPressed: () => cart.removeSingleItem(productId),
                                   ),
-                                  Text('${item.quantity}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                  Text(
+                                    '${item.quantity}', 
+                                    key: ValueKey('cart_qty_$productId'),
+                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
+                                  ),
                                   IconButton(
+                                    key: ValueKey('cart_increase_$productId'),
                                     icon: const Icon(Icons.add_circle_outline, color: Colors.green),
                                     onPressed: () => cart.addItem(productId, item.price, item.title),
                                   ),
@@ -145,9 +165,9 @@ class CartScreen extends StatelessWidget {
                     ),
             ),
             
-            // Total Card (Only shown if cart is NOT empty)
             if (cart.items.isNotEmpty)
               Card(
+                key: const Key('cart_total_card'),
                 color: Colors.white.withValues(alpha: 0.9),
                 margin: const EdgeInsets.all(15),
                 elevation: 5,
@@ -157,8 +177,13 @@ class CartScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text('Total', style: TextStyle(fontSize: 20)),
-                      Chip(label: Text('\$${cart.totalAmount.toStringAsFixed(2)}', style: const TextStyle(color: Colors.white)), backgroundColor: Colors.green),
+                      Chip(
+                        key: const Key('cart_total_chip'),
+                        label: Text('\$${cart.totalAmount.toStringAsFixed(2)}', style: const TextStyle(color: Colors.white)), 
+                        backgroundColor: Colors.green
+                      ),
                       ElevatedButton(
+                        key: const Key('cart_proceed_button'),
                         onPressed: () {
                           Navigator.push(
                             context,
@@ -180,13 +205,13 @@ class CartScreen extends StatelessWidget {
                 ),
               ),
 
-            // Continue to Buy Button (ALWAYS visible at the bottom)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
               child: SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
+                  key: const Key('cart_continue_shopping_button'),
                   onPressed: () {
                     Navigator.pushAndRemoveUntil(
                       context,
@@ -217,19 +242,20 @@ class CartScreen extends StatelessWidget {
       context: context,
       barrierDismissible: false,
       builder: (c) => Dialog(
+        key: const Key('cart_success_dialog'),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Image.asset('images/food-delivery.png', height: 150, fit: BoxFit.contain),
+              Image.asset('images/food-delivery.png', key: const Key('cart_success_image'), height: 150, fit: BoxFit.contain),
               const SizedBox(height: 20),
-              const Text("Order Placed!", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.green)),
+              const Text("Order Placed!", key: Key('cart_success_title'), style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.green)),
               const SizedBox(height: 10),
-              const Text("Sending your order to the restaurant...", textAlign: TextAlign.center, style: TextStyle(fontSize: 16, color: Colors.black54)),
+              const Text("Sending your order to the restaurant...", key: Key('cart_success_subtitle'), textAlign: TextAlign.center, style: TextStyle(fontSize: 16, color: Colors.black54)),
               const SizedBox(height: 20),
-              const CircularProgressIndicator(color: Colors.amber),
+              const CircularProgressIndicator(key: Key('cart_success_loading'), color: Colors.amber),
             ],
           ),
         ),

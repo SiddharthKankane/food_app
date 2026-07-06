@@ -22,21 +22,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _isLoading = false;
 
   void _handleRegister() async {
-    // Basic Validation
     if (_userController.text.isEmpty || 
         _emailController.text.isEmpty || 
         _phoneController.text.isEmpty || 
         _locationController.text.isEmpty ||
         _passController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill in all fields")),
+        const SnackBar(
+          key: Key('register_validation_snackbar'),
+          content: Text("Please fill in all fields")
+        ),
       );
       return;
     }
 
     if (_passController.text != _confirmPassController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Passwords do not match!")),
+        const SnackBar(
+          key: Key('register_password_mismatch_snackbar'),
+          content: Text("Passwords do not match!")
+        ),
       );
       return;
     }
@@ -55,7 +60,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _isLoading = false);
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Account created! Please login.")),
+      const SnackBar(
+        key: Key('register_success_snackbar'),
+        content: Text("Account created! Please login.")
+      ),
     );
     
     DefaultTabController.of(context).animateTo(0);
@@ -64,6 +72,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: const Key('register_scaffold'),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -75,11 +84,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
         child: SafeArea(
           child: SingleChildScrollView(
+            key: const Key('register_scroll_view'),
             child: Column(
               children: [
                 const SizedBox(height: 20),
                 Image.asset(
                   "images/welcome.png",
+                  key: const Key('register_welcome_image'),
                   height: 150,
                 ),
                 const SizedBox(height: 10),
@@ -88,36 +99,42 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: Column(
                     children: [
                       CustomTextField(
+                        key: const Key('register_username_field'),
                         data: Icons.person,
                         controller: _userController,
-                        hintText: "User ID",
+                        hintText: "Username",
                         isObscure: false,
                       ),
                       CustomTextField(
+                        key: const Key('register_email_field'),
                         data: Icons.email,
                         controller: _emailController,
                         hintText: "Email ID",
                         isObscure: false,
                       ),
                       CustomTextField(
+                        key: const Key('register_phone_field'),
                         data: Icons.phone,
                         controller: _phoneController,
                         hintText: "Phone Number",
                         isObscure: false,
                       ),
                       CustomTextField(
+                        key: const Key('register_location_field'),
                         data: Icons.my_location,
                         controller: _locationController,
                         hintText: "Delivery Address",
                         enabled: true,
                       ),
                       CustomTextField(
+                        key: const Key('register_password_field'),
                         data: Icons.lock,
                         controller: _passController,
                         hintText: "Password",
                         isObscure: true,
                       ),
                       CustomTextField(
+                        key: const Key('register_confirm_password_field'),
                         data: Icons.lock_outline,
                         controller: _confirmPassController,
                         hintText: "Confirm Password",
@@ -128,8 +145,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 20),
                 _isLoading 
-                  ? const CircularProgressIndicator(color: Colors.white)
+                  ? const CircularProgressIndicator(
+                      key: Key('register_loading_indicator'),
+                      color: Colors.white
+                    )
                   : ElevatedButton(
+                      key: const Key('register_submit_button'),
                       onPressed: _handleRegister,
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.purple,

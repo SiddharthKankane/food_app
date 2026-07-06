@@ -18,7 +18,6 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
     super.initState();
-    // Initially, show all items
     _filteredItems = dummyMenu;
   }
 
@@ -27,7 +26,6 @@ class _SearchScreenState extends State<SearchScreen> {
       if (query.isEmpty) {
         _filteredItems = dummyMenu;
       } else {
-        // Filter the list based on the title matching the search text
         _filteredItems = dummyMenu
             .where((item) =>
                 item.title.toLowerCase().contains(query.toLowerCase()))
@@ -39,8 +37,10 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: const Key('search_scaffold'),
       backgroundColor: Colors.white,
       appBar: AppBar(
+        key: const Key('search_app_bar'),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -61,6 +61,7 @@ class _SearchScreenState extends State<SearchScreen> {
         actions: [
           Consumer<CartProvider>(
             builder: (_, cart, ch) => Badge(
+              key: const Key('search_cart_badge'),
               label: Text(
                 cart.itemCount.toString(),
                 style: const TextStyle(color: Colors.white),
@@ -69,6 +70,7 @@ class _SearchScreenState extends State<SearchScreen> {
               child: ch,
             ),
             child: IconButton(
+              key: const Key('search_cart_button'),
               icon: const Icon(Icons.shopping_cart, color: Colors.black, size: 28),
               onPressed: () {
                 Navigator.push(
@@ -92,21 +94,21 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
         child: Column(
           children: [
-            // 1. The Custom Image Header
             Container(
               height: 150,
               width: double.infinity,
               color: Colors.transparent,
               child: Image.asset(
-                'images/login.png', // Using your uploaded image here!
+                'images/login.png', 
+                key: const Key('search_header_image'),
                 fit: BoxFit.contain,
               ),
             ),
 
-            // 2. The Search Bar
             Padding(
               padding: const EdgeInsets.all(15.0),
               child: TextField(
+                key: const Key('search_text_field'),
                 onChanged: (value) => _runSearch(value),
                 style: const TextStyle(color: Colors.black),
                 decoration: InputDecoration(
@@ -124,21 +126,23 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
             ),
 
-            // 3. The Search Results
             Expanded(
               child: _filteredItems.isEmpty
                   ? const Center(
                       child: Text(
                         "No food found!",
+                        key: Key('search_empty_text'),
                         style: TextStyle(fontSize: 18, color: Colors.black87),
                       ),
                     )
                   : ListView.builder(
+                      key: const Key('search_results_list'),
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       itemCount: _filteredItems.length,
                       itemBuilder: (context, index) {
                         final item = _filteredItems[index];
                         return InkWell(
+                          key: ValueKey('search_item_${item.id}'),
                           onTap: () {
                             Navigator.push(
                               context,

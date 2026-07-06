@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:food_app/screens/cart/cart_screen.dart';
-import 'package:food_app/providers/cart_provider.dart';
 import 'package:food_app/models/order_model.dart';
 import 'package:food_app/providers/cart_provider.dart';
+import 'package:food_app/screens/cart/cart_screen.dart';
 
 class ReceiptScreen extends StatelessWidget {
   final PastOrder order;
@@ -13,8 +12,10 @@ class ReceiptScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: const Key('receipt_scaffold'),
       backgroundColor: Colors.white,
       appBar: AppBar(
+        key: const Key('receipt_app_bar'),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(colors: [Colors.cyan, Colors.amber]),
@@ -25,6 +26,7 @@ class ReceiptScreen extends StatelessWidget {
         actions: [
           Consumer<CartProvider>(
             builder: (_, cart, ch) => Badge(
+              key: const Key('receipt_cart_badge'),
               label: Text(
                 cart.itemCount.toString(),
                 style: const TextStyle(color: Colors.white),
@@ -33,6 +35,7 @@ class ReceiptScreen extends StatelessWidget {
               child: ch,
             ),
             child: IconButton(
+              key: const Key('receipt_cart_button'),
               icon: const Icon(Icons.shopping_cart, color: Colors.black, size: 28),
               onPressed: () {
                 Navigator.push(
@@ -60,20 +63,33 @@ class ReceiptScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
-                child: Image.asset('images/delivered.jpg', height: 120),
+                child: Image.asset(
+                  'images/delivered.jpg', 
+                  key: const Key('receipt_top_image'),
+                  height: 120
+                ),
               ),
               const SizedBox(height: 20),
-              Text("Order #${order.id}", style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-              Text(order.date, style: const TextStyle(color: Colors.black54)),
+              Text(
+                "Order #${order.id}", 
+                key: const Key('receipt_order_id'),
+                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)
+              ),
+              Text(
+                order.date, 
+                key: const Key('receipt_order_date'),
+                style: const TextStyle(color: Colors.black54)
+              ),
               const Divider(height: 40, thickness: 2, color: Colors.black26),
               
-              // List out the items purchased
               Expanded(
                 child: ListView.builder(
+                  key: const Key('receipt_items_list'),
                   itemCount: order.items.length,
                   itemBuilder: (context, index) {
                     final item = order.items[index];
                     return Padding(
+                      key: ValueKey('receipt_item_row_${item.id}'),
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -92,19 +108,22 @@ class ReceiptScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text("Total Paid", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  Text("\$${order.totalAmount.toStringAsFixed(2)}", style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.green)),
+                  Text(
+                    "\$${order.totalAmount.toStringAsFixed(2)}", 
+                    key: const Key('receipt_total_amount'),
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.green)
+                  ),
                 ],
               ),
               const SizedBox(height: 30),
               
-              // The Magic "Reorder" Button
               SizedBox(
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton.icon(
+                  key: const Key('receipt_reorder_button'),
                   onPressed: () {
                     final cart = Provider.of<CartProvider>(context, listen: false);
-                    // Loop through past items and add them to the current cart
                     for (var item in order.items) {
                       for (int i = 0; i < item.quantity; i++) {
                         cart.addItem(item.id, item.price, item.title);
@@ -112,9 +131,13 @@ class ReceiptScreen extends StatelessWidget {
                     }
                     ScaffoldMessenger.of(context).hideCurrentSnackBar();
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Items added to your cart!'), backgroundColor: Colors.green),
+                      const SnackBar(
+                        key: Key('receipt_reordered_snackbar'),
+                        content: Text('Items added to your cart!'), 
+                        backgroundColor: Colors.green
+                      ),
                     );
-                    Navigator.pop(context); // Go back to the orders list
+                    Navigator.pop(context);
                   },
                   icon: const Icon(Icons.refresh, color: Colors.black),
                   label: const Text("Reorder These Items", style: TextStyle(fontSize: 18, color: Colors.black)),

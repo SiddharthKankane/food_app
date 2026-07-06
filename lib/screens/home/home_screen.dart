@@ -15,24 +15,22 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // 1. Create a state variable to track the active category
   String _selectedCategory = 'All';
-
-  // 2. Define the categories you want to show in the scrollable bar
   final List<String> _categories = ['All', 'Burgers', 'Pizza', 'Healthy', 'Drinks'];
 
   @override
   Widget build(BuildContext context) {
     final userId = Provider.of<AuthProvider>(context, listen: false).userId;
 
-    // 3. Filter the dummyMenu based on the selected category
     List<Item> filteredMenu = _selectedCategory == 'All'
         ? dummyMenu
         : dummyMenu.where((item) => item.category == _selectedCategory).toList();
 
     return Scaffold(
+      key: const Key('home_scaffold'),
       backgroundColor: Colors.white,
       appBar: AppBar(
+        key: const Key('home_app_bar'),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(colors: [Colors.cyan, Colors.amber]),
@@ -43,15 +41,20 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           Consumer<CartProvider>(
             builder: (_, cart, ch) => Badge(
+              key: const Key('home_cart_badge'),
               label: Text(cart.itemCount.toString(), style: const TextStyle(color: Colors.white)),
               backgroundColor: Colors.red,
               child: ch,
             ),
-            child: IconButton(
-              icon: const Icon(Icons.shopping_cart, color: Colors.black, size: 28),
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (c) => const CartScreen()));
-              },
+            child: Semantics(
+              identifier: "home_cart_button",
+              child: IconButton(
+                key: const Key('home_cart_button'),
+                icon: const Icon(Icons.shopping_cart, color: Colors.black, size: 28),
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (c) => const CartScreen()));
+                },
+              ),
             ),
           ),
           const SizedBox(width: 15),
@@ -68,8 +71,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         child: Column(
           children: [
-            // The Restaurant Banner
             Container(
+              key: const Key('home_banner'),
               height: 150,
               width: double.infinity,
               decoration: const BoxDecoration(
@@ -94,10 +97,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             
-            // 4. The New Category Filter Bar
             _buildCategoryList(),
 
-            // The Menu Header
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
               child: Row(
@@ -105,23 +106,25 @@ class _HomeScreenState extends State<HomeScreen> {
                   Image.asset('images/menu.png', height: 25, width: 25),
                   const SizedBox(width: 10),
                   Text(
-                    "$_selectedCategory Menu", // Dynamically updates!
+                    "$_selectedCategory Menu", 
+                    key: ValueKey('home_menu_header_$_selectedCategory'),
                     style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
             ),
 
-            // 5. The Filtered Food List
             Expanded(
               child: filteredMenu.isEmpty
                   ? const Center(
                       child: Text(
                         "No items in this category yet!",
+                        key: Key('home_empty_menu_text'),
                         style: TextStyle(fontSize: 16, color: Colors.grey),
                       ),
                     )
                   : ListView.builder(
+                      key: const Key('home_food_list'),
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       itemCount: filteredMenu.length,
                       itemBuilder: (context, index) {
@@ -136,12 +139,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Helper widget to draw the horizontal category chips
   Widget _buildCategoryList() {
     return Container(
+      key: const Key('home_category_list_container'),
       height: 60,
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: ListView.builder(
+        key: const Key('home_category_list'),
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 10),
         itemCount: _categories.length,
@@ -150,6 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
           final isSelected = category == _selectedCategory;
 
           return GestureDetector(
+            key: ValueKey('category_chip_$category'),
             onTap: () {
               setState(() {
                 _selectedCategory = category;
@@ -181,9 +186,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Helper widget to keep the build method clean
   Widget _buildMenuItemCard(BuildContext context, Item item, String? userId) {
     return InkWell(
+      key: ValueKey('food_card_${item.id}'),
       onTap: () {
         Navigator.push(
           context,
@@ -202,27 +207,40 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Consumer<FavoritesProvider>(
-                builder: (context, favs, _) => IconButton(
-                  icon: Icon(
-                    favs.isFavorite(item) ? Icons.favorite : Icons.favorite_border,
-                    color: favs.isFavorite(item) ? Colors.red : Colors.grey,
+                builder: (context, favs, _) => Semantics(
+                  identifier: "fav_button_${item.id}",
+                  child: IconButton(
+                    key: ValueKey('fav_button_${item.id}'),
+                    icon: Icon(
+                      favs.isFavorite(item) ? Icons.favorite : Icons.favorite_border,
+                      color: favs.isFavorite(item) ? Colors.red : Colors.grey,
+                    ),
+                    onPressed: () {
+                      if (userId != null) {
+                        favs.toggleFavorite(item, userId);
+                      }
+                    },
                   ),
-                  onPressed: () {
-                    if (userId != null) {
-                      favs.toggleFavorite(item, userId);
-                    }
-                  },
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.add_circle, size: 35, color: Colors.amber),
-                onPressed: () {
-                  Provider.of<CartProvider>(context, listen: false)
-                      .addItem(item.id, item.price, item.title);
-                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('${item.title} added!'), duration: const Duration(seconds: 1)));
-                },
+              Semantics(
+                identifier: "add_to_cart_button_${item.id}",
+                child: IconButton(
+                  key: ValueKey('add_to_cart_button_${item.id}'),
+                  icon: const Icon(Icons.add_circle, size: 35, color: Colors.amber),
+                  onPressed: () {
+                    Provider.of<CartProvider>(context, listen: false)
+                        .addItem(item.id, item.price, item.title);
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          key: ValueKey('snackbar_added_${item.id}'),
+                          content: Text('${item.title} added!'), 
+                          duration: const Duration(seconds: 1)
+                        )
+                    );
+                  },
+                ),
               ),
             ],
           ),

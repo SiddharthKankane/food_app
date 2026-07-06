@@ -24,7 +24,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
       if (userId != null) {
         setState(() => _isLoading = true);
         Provider.of<OrderProvider>(context, listen: false).fetchOrders(userId).then((_) {
-          setState(() => _isLoading = false);
+          if (mounted) setState(() => _isLoading = false);
         });
       }
     }
@@ -38,8 +38,10 @@ class _OrdersScreenState extends State<OrdersScreen> {
     final orders = orderData.orders;
 
     return Scaffold(
+      key: const Key('orders_scaffold'),
       backgroundColor: Colors.white,
       appBar: AppBar(
+        key: const Key('orders_app_bar'),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(colors: [Colors.cyan, Colors.amber]),
@@ -51,6 +53,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
         actions: [
           Consumer<CartProvider>(
             builder: (_, cart, ch) => Badge(
+              key: const Key('orders_cart_badge'),
               label: Text(
                 cart.itemCount.toString(),
                 style: const TextStyle(color: Colors.white),
@@ -59,6 +62,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
               child: ch,
             ),
             child: IconButton(
+              key: const Key('orders_cart_button'),
               icon: const Icon(Icons.shopping_cart, color: Colors.black, size: 28),
               onPressed: () {
                 Navigator.push(
@@ -81,27 +85,40 @@ class _OrdersScreenState extends State<OrdersScreen> {
           ),
         ),
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator(color: Colors.amber))
+            ? const Center(
+                child: CircularProgressIndicator(
+                  key: Key('orders_loading_indicator'),
+                  color: Colors.amber
+                )
+              )
             : orders.isEmpty
                 ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.receipt_long, size: 80, color: Colors.black.withValues(alpha: 0.3)),
+                        Icon(
+                          Icons.receipt_long, 
+                          key: const Key('orders_empty_icon'),
+                          size: 80, 
+                          color: Colors.black.withValues(alpha: 0.3)
+                        ),
                         const SizedBox(height: 20),
                         const Text(
                           "No orders placed yet!",
+                          key: Key('orders_empty_text'),
                           style: TextStyle(fontSize: 18, color: Colors.black87),
                         ),
                       ],
                     ),
                   )
                 : ListView.builder(
+                    key: const Key('orders_list'),
                     padding: const EdgeInsets.all(15),
                     itemCount: orders.length,
                     itemBuilder: (context, index) {
                       final order = orders[index];
                       return Card(
+                        key: ValueKey('order_card_${order.id}'),
                         elevation: 3,
                         color: Colors.white.withValues(alpha: 0.9),
                         margin: const EdgeInsets.only(bottom: 15),
